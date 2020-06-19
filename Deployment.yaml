@@ -1,0 +1,35 @@
+apiVersion: apps/v1 #tutorial https://docs.docker.com/get-started/kube-deploy/
+kind: Deployment
+metadata:
+  name: socket-demo
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      socket: tic-tac
+  template:
+    metadata:
+      labels:
+        socket: tic-tac
+    spec:
+      containers:
+        - name: socket-demo-tic-tac
+          image: sebampuerom/tic-tac-toe-socketdemo:1.4
+          env:
+            - name: session-manager-ip
+              value: "session-manager-service"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: socket-demo
+  namespace: default
+spec:
+  type: NodePort
+  selector:
+    socket: tic-tac
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30001
